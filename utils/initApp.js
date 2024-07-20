@@ -32,6 +32,8 @@ app.use(express.json());
 app.use('/users',routes.userRoutr)
 app.use('/categories',routes.categoryRoutr)
 app.use('/subCategories',routes.subCategoryRoutr)
+app.use('/brands',routes.brandRoutr)
+
 
 
 
