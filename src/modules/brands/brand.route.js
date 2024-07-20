@@ -38,7 +38,7 @@ route.patch('/:id',
     
 
         route.get('/',
-            auth(Object.values(systemRoles)),
+            // auth(Object.values(systemRoles)),
            BC.getBrands)
        
    
