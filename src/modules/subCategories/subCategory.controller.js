@@ -156,7 +156,10 @@ export const deleteSubCategory = asyncHandling(async (req, res, next) => {
 
 export const getSubCategories = asyncHandling(async(req,res,next)=>{
 
-    const subCategories=await subCategoryModel.find({})
+    const subCategories=await subCategoryModel.find({}).populate([
+        { path:"category",},
+        {path:'createdBy', select:'-_id -password'  }
+    ])
     if(!subCategories) return next(new AppError('No SubCategories available',404))
 
         res.status(201).json({msg:'All SubCategories fetched',subCategories})

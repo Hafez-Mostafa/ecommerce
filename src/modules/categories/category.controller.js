@@ -128,10 +128,19 @@ export const delelteCategory = asyncHandling(async (req, res, next) => {
 //==================================Start GetCategories============================================================
 
 
-export const getCategories = asyncHandling(async(req,res,next)=>{
+export const getCategories = asyncHandling(async (req, res, next) => {
 
-    const categories=await categoryModel.find({})
-    if(!categories) return next(new AppError('No Categories available',404))
+    const categories = await categoryModel.find({})
+    if (!categories) return next(new AppError('No Categories available', 404))
+    let list = [];
+    for (const category of categories) {
+        const subCategoies = await subCategoryModel.find({ category: category._id })
+        const newCategory = category.toObject();// convert from BSON to Object
+        newCategory.subCategoies = subCategoies // add subcategory to categoryobject based on Categoryid stored in subcategorymodel
+        // add all subcategories in its each category parent
+        list.push(newCategory)
 
-        res.status(201).json({msg:'All Categories fetched',categories})
+    }
+
+    res.status(201).json({ msg: 'All Categories fetched', categories:list })
 })
