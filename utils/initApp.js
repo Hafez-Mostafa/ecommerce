@@ -35,13 +35,8 @@ app.use('/subCategories',routes.subCategoryRoutr)
 app.use('/brands',routes.brandRoutr)
 
 
-
-
-
-
-
 app.get('/', (req, res, next) => {
-    res.status(200).send('Job App!');
+    res.status(200).send('Ecommerce App  [Mosmoyas] !');
 });
 
 app.get('*', (req, res,next) =>{
