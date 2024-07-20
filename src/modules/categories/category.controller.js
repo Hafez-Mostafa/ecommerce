@@ -123,3 +123,15 @@ export const delelteCategory = asyncHandling(async (req, res, next) => {
 
     res.status(201).json({ msg: 'Deleted successfully', category });
 });
+
+
+//==================================Start GetCategories============================================================
+
+
+export const getCategories = asyncHandling(async(req,res,next)=>{
+
+    const categories=await categoryModel.find({})
+    if(!categories) return next(new AppError('No Categories available',404))
+
+        res.status(201).json({msg:'All Categories fetched',categories})
+})

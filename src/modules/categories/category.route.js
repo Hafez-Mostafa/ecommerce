@@ -39,6 +39,10 @@ route.patch('/:id',
         CC.delelteCategory)
     
 
-
+        route.get('/',
+            auth(Object.values(systemRoles)),
+           CC.getCategories)
+       
+   
 
 export default route

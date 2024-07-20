@@ -104,13 +104,8 @@ export const deleltebrand = asyncHandling(async (req, res, next) => {
     const { id } = req.params;
 
     //   delete brand if it is exist
-
     const brand = await brandModel.findOneAndDelete({ _id: id, createdBy: req.user._id });
     if (!brand) return next(new AppError('brand does not exist', 409));
-
-    // find und  delete Subbrand if the subbrand exists
-    // const subbrand = await subbrandModel.deleteMany({ brand: brand._id });
-    // if (!subbrand) return next(new AppError('subbrand does not exist', 409));
 
     // delete  brand from cloudinary
     const folderPath = `Ecommerce/brands/${brand.customId}`;
@@ -121,3 +116,13 @@ export const deleltebrand = asyncHandling(async (req, res, next) => {
 
     res.status(201).json({ msg: 'Deleted successfully', brand });
 });
+
+//==================================Start Get Brands ===================================================
+
+export const getBrands = asyncHandling(async(req,res,next)=>{
+
+    const brands=await brandModel.find({})
+    if(!brands) return next(new AppError('No Brands available',404))
+
+        res.status(201).json({msg:'All Brands fetched',brands})
+})

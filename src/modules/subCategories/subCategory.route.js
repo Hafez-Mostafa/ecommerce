@@ -39,5 +39,8 @@ route.patch('/:id',
        SC.deleteSubCategory)
    
 
-
+       route.get('/',
+        auth(Object.values(systemRoles)),
+       SC.getSubCategories)
+   
 export default route

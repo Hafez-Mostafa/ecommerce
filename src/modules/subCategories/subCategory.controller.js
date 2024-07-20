@@ -150,3 +150,14 @@ export const deleteSubCategory = asyncHandling(async (req, res, next) => {
         res.status(201).json({ msg: 'Deleted successfully', subCategory });
     
 });
+
+//==================================Start GetSubCategories============================================================
+
+
+export const getSubCategories = asyncHandling(async(req,res,next)=>{
+
+    const subCategories=await subCategoryModel.find({})
+    if(!subCategories) return next(new AppError('No SubCategories available',404))
+
+        res.status(201).json({msg:'All SubCategories fetched',subCategories})
+})

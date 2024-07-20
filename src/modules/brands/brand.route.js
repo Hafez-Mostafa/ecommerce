@@ -37,6 +37,10 @@ route.patch('/:id',
         BC.deleltebrand)
     
 
-
+        route.get('/',
+            auth(Object.values(systemRoles)),
+           BC.getBrands)
+       
+   
 
 export default route
