@@ -9,11 +9,10 @@ export const asyncHandling = (fn) => {
     }
 
 }
-
 // Global error handling middleware
 export const globalErrorHandling = (err, req, res, next) => {
     if (res.headersSent) {
-        return next(err);  // If headers are already sent, delegate to the default Express error handler
+        return next(err); // If headers are already sent, delegate to the default Express error handler
     }
 
     if (err instanceof AppError) {
@@ -22,14 +21,13 @@ export const globalErrorHandling = (err, req, res, next) => {
             message: err.message,
         });
     } else {
-        // Log the detailed error internally for debugging
-        //  console.error('Unexpected Error:', err.ReferenceError);
+        console.error('Unexpected Error:', err); // Log the detailed error internally for debugging
 
         // Handle unknown errors and provide specific information in the response
         res.status(500).json({
             status: 'error',
             message: 'An unexpected error occurred',
-            error: err, // Include specific error message
+            error: err.message, // Include specific error message
         });
     }
 

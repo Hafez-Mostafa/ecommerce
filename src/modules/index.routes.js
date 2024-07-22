@@ -5,6 +5,8 @@ import brandRoutr from './brands/brand.route.js'
 import productRoutr from './products/product.route.js'
 import couponRoutr from './coupons/coupon.route.js'
 import cartRoutr from './carts/cart.route.js'
+import ordertRoutr from './orders/order.route.js'
+
 
 
 
@@ -18,5 +20,6 @@ export {
   brandRoutr,
   productRoutr,
   couponRoutr,
-  cartRoutr
+  cartRoutr,
+  ordertRoutr
 }

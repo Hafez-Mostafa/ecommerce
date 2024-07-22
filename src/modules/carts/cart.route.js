@@ -22,11 +22,17 @@ route.post('/',
     CC.createCart)
 
 
-    // route.patch('/:id',
-    //     validation(CV.updateCart),
-    //     auth(systemRoles.Admin),
-    //     CC.updateCoupn)
-    
-    
+route.patch('/',
+    validation(CV.removeCart),
+    auth(systemRoles.Admin),
+    CC.removeCart)
+
+route.put('/',
+    validation(CV.clearCart),
+    auth(systemRoles.Admin),
+    CC.clearCart)
+
+
+
 
 export default route

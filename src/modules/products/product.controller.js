@@ -69,6 +69,7 @@ export const createProduct = asyncHandling(async (req, res, next) => {
         price,
         stock,
         subPrice,
+        discount,
         customId,
         slug: slugify(title, {
             replacement: '_',

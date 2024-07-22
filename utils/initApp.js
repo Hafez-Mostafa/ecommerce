@@ -36,6 +36,8 @@ app.use('/brands',routes.brandRoutr)
 app.use('/products',routes.productRoutr)
 app.use('/coupons',routes.couponRoutr)
 app.use('/carts',routes.cartRoutr)
+app.use('/orders',routes.ordertRoutr)
+
 
 
 
