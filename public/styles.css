@@ -1,0 +1,125 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.search-bar {
+    flex-grow: 1;
+    margin: 0 20px;
+    padding: 5px;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin: 0 10px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.profile-icon {
+    font-size: 24px;
+}
+
+.hero-section .carousel {
+    display: flex;
+    overflow: hidden;
+    position: relative;
+}
+
+.hero-section .carousel-item {
+    min-width: 100%;
+    transition: transform 0.5s ease;
+    max-height: 50%;
+}
+
+.hero-section img {
+    width: 100%;
+    height: auto;
+}
+
+.hero-section button {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background-color: #ff9900;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+}
+
+.featured-categories, .top-deals, .new-arrivals, .popular-products, .customer-testimonials, .newsletter-subscription, footer {
+    padding: 20px;
+    text-align: center;
+}
+
+.featured-categories .categories, .top-deals .deals, .new-arrivals .product-carousel, .popular-products .product-grid, .customer-testimonials .testimonial-carousel {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.featured-categories .category, .top-deals .deal, .new-arrivals .product, .popular-products .product, .customer-testimonials .testimonial {
+    margin: 10px;
+}
+
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+footer .quick-links, footer .social-media, footer .contact-info, footer .newsletter-subscription {
+    margin: 10px;
+}
+
+footer a {
+    color: #ff9900;
+    text-decoration: none;
+}
+
+footer form {
+    display: flex;
+}
+
+footer input[type="email"] {
+    padding: 5px;
+    margin-right: 10px;
+}
+
+footer button {
+    padding: 5px 10px;
+    background-color: #ff9900;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+}

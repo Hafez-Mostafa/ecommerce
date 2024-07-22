@@ -35,9 +35,16 @@ const categorySchema = new Schema({
     },
     customId:{type:String,required:[true, 'CustomID is required!']}
 }, {
-        timestamps:true,versionKey:false
+        timestamps:true,versionKey:false,toJSON:{virtuals:true},toObject:{virtuals:true}
     });
 
+
+    categorySchema.virtual('subCategories',{
+        ref:"SubCategory",
+        localField:'_id',
+        foreignField:'category'
+
+    })
 const Category = mongoose.model('Category', categorySchema);
 
 export default Category;

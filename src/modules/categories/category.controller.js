@@ -15,7 +15,6 @@ import slugify from 'slugify'
 export const createCategory = asyncHandling(async (req, res, next) => {
     const { name } = req.body;
     // Check if the category already exists
-    console.log(req.file)
     const existCategory = await categoryModel.findOne({ name: name.toLowerCase() })
     if (existCategory) return next(new AppError(`Categoy of ${name} is already exist`, 409));
 
@@ -130,17 +129,19 @@ export const delelteCategory = asyncHandling(async (req, res, next) => {
 
 export const getCategories = asyncHandling(async (req, res, next) => {
 
-    const categories = await categoryModel.find({})
-    if (!categories) return next(new AppError('No Categories available', 404))
-    let list = [];
-    for (const category of categories) {
-        const subCategoies = await subCategoryModel.find({ category: category._id })
-        const newCategory = category.toObject();// convert from BSON to Object
-        newCategory.subCategoies = subCategoies // add subcategory to categoryobject based on Categoryid stored in subcategorymodel
-        // add all subcategories in its each category parent
-        list.push(newCategory)
+    const categories = await categoryModel.find({}).populate([{
+        path:'subCategories'
+    }])
+    // if (!categories) return next(new AppError('No Categories available', 404))
+    // let list = [];
+    // for (const category of categories) {
+    //     const subCategoies = await subCategoryModel.find({ category: category._id })
+    //     const newCategory = category.toObject();// convert from BSON to Object
+    //     newCategory.subCategoies = subCategoies // add subcategory to categoryobject based on Categoryid stored in subcategorymodel
+    //     // add all subcategories in its each category parent
+    //     list.push(newCategory)
 
-    }
+    // }
 
-    res.status(201).json({ msg: 'All Categories fetched', categories:list })
+    res.status(201).json({ msg: 'All Categories fetched', categories })
 })

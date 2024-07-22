@@ -28,16 +28,23 @@ connectionDB()
 app.use(express())
 app.use(express.json());
 
-
+app.use(express.static(path.resolve('public')));
 app.use('/users',routes.userRoutr)
 app.use('/categories',routes.categoryRoutr)
 app.use('/subCategories',routes.subCategoryRoutr)
 app.use('/brands',routes.brandRoutr)
+app.use('/products',routes.productRoutr)
+app.use('/coupons',routes.couponRoutr)
+app.use('/carts',routes.cartRoutr)
+
+
+
 
 
 app.get('/', (req, res, next) => {
-    res.status(200).send('Ecommerce App  [Mosmoyas] !');
+    res.sendFile(path.resolve('/index.html'));
 });
+
 
 app.get('*', (req, res,next) =>{
     return next(new AppError(`Invalid URL : ${req.originalUrl}`,404))

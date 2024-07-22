@@ -1,9 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import systemRoles from "../../utils/systemRoles.js";
 
-const generateUsername = (firstname, lastname) => {
-    return `${firstname} ${lastname}`;
-};
 
 const generateAge = (dob) => {
     const birthDate = new Date(dob);
@@ -43,10 +40,7 @@ const userSchema = new Schema({
         minlength: [3, 'Name must be at least 3 characters long'],
         maxlength: [15, 'Name must not be more than 15 characters long']
     },
-    username: {
-        type: String,
-        unique: true
-    },
+
     email: {
         type: String,
         trim: true,
@@ -87,7 +81,8 @@ const userSchema = new Schema({
         type: Number,
         unique: true
     },
-    address: {type:[String],
+    address: {
+        type: [String],
         required: [true, 'Address is required!'],
 
     },
@@ -101,25 +96,24 @@ const userSchema = new Schema({
         default: false
     },
     loggedIn: {
-        type:Boolean,
+        type: Boolean,
         default: false
     },
     code: String,
     passwordChangedAt: Date
 },
-{
-    timestamps:true,versionKey:false
-});
+    {
+        timestamps: true,
+        versionKey: false,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+    });
+
 
 userSchema.pre('save', function (next) {
     // Convert DOB to Date object if it's a string
     if (typeof this.DOB === 'string') {
         this.DOB = new Date(this.DOB);
-    }
-
-    // Set the username based on firstname and lastname
-    if (this.isModified('firstname') || this.isModified('lastname')) {
-        this.username = generateUsername(this.firstname, this.lastname);
     }
 
     // Set the age based on DOB
@@ -129,7 +123,12 @@ userSchema.pre('save', function (next) {
 
     next();
 });
+userSchema.virtual('fullName').get(function () {
+    return `${this.firstname} ${this.lastname}`;
+});
+
 
 const userModel = mongoose.model('User', userSchema);
 
+const doc = new userModel()
 export default userModel;

@@ -1,4 +1,4 @@
-import { Router } from "express";
+import express from "express";
 //contoller
 import * as CC from './category.controller.js'
 //validation
@@ -11,11 +11,13 @@ import { fileTypes } from "../../middleware/multer.js";
 import { auth } from "../../middleware/auth.js";
 import systemRoles from "../../../utils/systemRoles.js";
 import subCategoryRouter from "../subCategories/subCategory.route.js";
+import {setHeaders} from '../../middleware/setHeader.js'
 
 
 
+// const route = express.Router({caseSensitive:true})
 
-const route = Router()
+const route = express.Router()
 route.use('/:categoryId/subCategories',subCategoryRouter,)
 route.post('/',
     configureUpload(fileTypes.images)
@@ -24,9 +26,12 @@ route.post('/',
     auth(systemRoles.Admin),
     CC.createCategory)
 
+
+
 route.patch('/:id',
     configureUpload(fileTypes.images)
         .single('image'),
+         setHeaders(),
       validation(CV.updateCategory),
      auth(systemRoles.Admin),
     CC.updateCategory)
