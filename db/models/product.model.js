@@ -73,7 +73,10 @@ const productSchema = new Schema({
         max: 100
     }, rateAvg: {
         type: Number,
-        default: 1,
+        default: 0,
+    }, rateNum: {
+        type: Number,
+        default: 0,
     }, stock: {
         type: Number,
         requird: true,

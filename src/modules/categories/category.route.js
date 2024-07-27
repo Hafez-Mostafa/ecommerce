@@ -22,8 +22,8 @@ route.use('/:categoryId/subCategories',subCategoryRouter,)
 route.post('/',
     configureUpload(fileTypes.images)
         .single('image'),
-    validation(CV.createCategory),
-    auth(systemRoles.Admin),
+     validation(CV.createCategory),
+    auth([systemRoles.Admin]),
     CC.createCategory)
 
 

@@ -11,10 +11,15 @@ import { fileTypes } from "../../middleware/multer.js";
 import { auth } from "../../middleware/auth.js";
 import systemRoles from "../../../utils/systemRoles.js";
 
+import routeReview from '../reviews/review.route.js'
+import routeWishList from '../wishlists/wishList.route.js'
 
 
 
-const route = Router({ mergeParams: true })
+const route = Router()
+route.use('/:productId/reviews', routeReview)
+route.use('/:productId/wishLists', routeWishList)
+
 
 route.post('/',
     configureUpload(fileTypes.images).fields([
@@ -24,24 +29,24 @@ route.post('/',
     auth(systemRoles.Admin),
     PC.createProduct)
 
-// route.patch('/:id',
-//     configureUpload(fileTypes.images)
-//         .single('image'),
-//     //  validation(PV.updateSubCategory),
-//      auth(systemRoles.Admin),
-//     PC.updateCategory)
+route.put('/:id',
+    configureUpload(fileTypes.images).fields([
+        { name: "image", maxCount: 1 },
+        { name: 'coverImages', maxCount: 4 }]),
+    validation(PV.updateProduct),
+    auth(systemRoles.Admin),
+    PC.updateProduct)
 
 
 
 
-//     route.delete('/:id',
-//         validation(PV.deleteSubCategory),
-//         auth(systemRoles.Admin),
-//        PC.deleteSubCategory)
+    route.delete('/:id',
+        validation(PV.deleteProduct),
+        auth(systemRoles.Admin),
+       PC.deleteProduct)
 
 
-//        route.get('/',
-//         // auth(Object.values(systemRoles)),
-//        PC.getSubCategories)
+       route.get('/',
+       PC.getProducts)
 
 export default route

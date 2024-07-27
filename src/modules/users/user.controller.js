@@ -25,7 +25,7 @@ export const signUp = asyncHandling(async (req, res, next) => {
         && next(new AppError('Email is already in Use', 409));
 
     // Create token for email confirmation
-    const token = jwt.sign({ email }, process.env.JWT_GEN_CONFIRM_EMAIL, { expiresIn: '1m' });
+    const token = jwt.sign({ email }, process.env.JWT_GEN_CONFIRM_EMAIL, { expiresIn: '1h' });
     const otpLink =
         `${req.protocol}://${req.headers.host}/users/verifyEmail/${encodeURIComponent(token)}`;
 
@@ -123,18 +123,22 @@ export const signIn = asyncHandling(async (req, res, next) => {
     const user = await userModel.findOne({ email, confirmed: true });
 
     // Check if user exists
-    if (!user) return next(new AppError('User not found or Account is not confirmed yet', 400));
+    if (!user) return next(new AppError('User not found or account is not confirmed yet', 400));
 
     // Validate password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) return next(new AppError('Invalid credentials', 401));
 
-    // Create JWT token
-    const token = jwt.sign({ role: user.role, email: user.email },
-        process.env.JWT_SECRET);// Token expiration (optional, recommended)
+    // Create JWT token with expiration
+    console.log(process.env.JWT_SECRET)
+    const token = jwt.sign(
+        { id: user._id, role: user.role, email: user.email },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' } // Token expiration, e.g., '1h'
+    );
 
     // Update user status to online
-    await userModel.updateOne({ email }, { status: 'online' });
+    await userModel.updateOne({ email }, { status: true });
 
     // Send response
     res.status(200).json({ message: 'User signed in successfully', token });

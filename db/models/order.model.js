@@ -16,7 +16,7 @@ const orderSchema = new Schema({
     }],
 
     subPrice: { type: Number, required: true },
-    copunId: { type: Types.ObjectId, ref: 'Coupon', },
+    couponId: { type: Types.ObjectId, ref: 'Coupon', },
     totalPrice: { type: Number, required: true },
     address: { type: String, required: true },
     phone: { type: String, required: true },

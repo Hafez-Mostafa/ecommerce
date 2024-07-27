@@ -35,31 +35,84 @@ export const createOrder = asyncHandling(async (req, res, next) => {
 
     for (let product of products) {
         const checkProduct = await productModel.findOne({ _id: product.productId, stock: { $gte: product.quantity } });
-        if (!checkProduct) {
-            return next(new AppError('product not exists or out of stock', 404));
-        }
-
+        if (!checkProduct) { return next(new AppError('product not exists or out of stock', 404));}
         if (flag) product = product.toObject();
-
         product.title = checkProduct.title;
         product.price = checkProduct.price;
         product.finalPrice = product.quantity * checkProduct.price; // Assuming `checkProduct.price` is the correct price field
-
         subPrice += product.finalPrice;
         finalProducts.push(product);
     }
 
+    // create order according the upon handled data 
     const order = await orderModel.create({
         user: req.user._id,
         products: finalProducts,
         subPrice,
-        couponId: req.body?.coupon?._id,
+        couponId: req.body.coupon._id,
         totalPrice: subPrice - (subPrice * (req.body.coupon?.amount || 0) / 100),
         paymentMethod,
         status: paymentMethod === 'cash' ? 'placed' : 'waitPayment',
         phone,
         address
     });
+    // adding the user to coupon model as usedBy
+    if (req.body?.coupon)
+        await couponModel.updateOne({ _id: req.body.coupon._id }, { $push: { usedBy: req.user._id } })
+
+    // reduce the stock in the productmodel by the ordered quantity
+    for (const product of finalProducts) {
+        await productModel.findOneAndUpdate({ _id: product.productId }, {
+            $inc: { stock: -product.quantity }
+        }
+        )
+    }
+    //clear trhe cart if the order pulled out from it
+    if (flag)
+        await cartModel.updateOne({ user: req.user._id }, { products: [] })
 
     res.status(201).json({ msg: "Order created Successfully", order });
 });
+
+
+
+
+export const cancelOrder = asyncHandling(async (req, res, next) => {
+    const { reason } = req.body;
+    const { id } = req.params
+
+    const order = await orderModel.findOne({ _id: id, user: req.user._id })
+    if (!order) return next(new AppError('Order not exist ', 404))
+
+    if ((order.paymentMethod === 'cash' && order.status != 'placed')
+        || (order.paymentMethod === 'card' && order.status != 'waitPayment')) return next(new AppError('OrYou can not cancell this order ', 404))
+
+    // change order status to cancelled and save the reason
+    await orderModel.updateOne({ _id: id }, {
+        status: "cancelled",
+        cancelledBy: req.user._id,
+        reason
+
+    })
+
+
+    // reomve the user from the coupon as usedBy
+
+
+    if (order?.couponId)
+        await couponModel.updateOne({ _id: order?.couponId }, {
+            $pull: { usedBy: req.user._id }
+        })
+    // decrease the stock in the product model
+    for (const product of order.products) {
+        await productModel.updateOne({ _id: product.productId }, {
+            $inc: { stock: product.quantity }
+        })
+
+    }
+
+    res.status(201).json({ msg: "Order cancceled Successfully" });
+});
+
+
+
