@@ -19,6 +19,8 @@ export const globalErrorHandling = (err, req, res, next) => {
         res.status(err.statusCode).json({
             status: 'error',
             message: err.message,
+            stack:err.stack
+            
         });
     } else {
         console.error('Unexpected Error:', err); // Log the detailed error internally for debugging
@@ -28,6 +30,9 @@ export const globalErrorHandling = (err, req, res, next) => {
             status: 'error',
             message: 'An unexpected error occurred',
             error: err.message, // Include specific error message
+            stack:err.stack
+
+        
         });
     }
 

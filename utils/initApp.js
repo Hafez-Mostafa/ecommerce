@@ -6,6 +6,9 @@ dotenv.config({path:path.resolve('config/.env')});
 
 import AppError from '../utils/AppError.js';
 import  {globalErrorHandling}  from '../utils/errorHandling.js';
+import  {deleteFromCloudinary}  from '../utils/deleteFromCloudinary.js';
+import  {deleteFromDB}  from '../utils/deleteFromDB.js';
+
 import  connectionDB  from '../db/connectionDB.js';
 import * as  routes from '../src/modules/index.routes.js';
 
@@ -76,7 +79,23 @@ app.get('*', (req, res,next) =>{
 
 
 
-app.use(globalErrorHandling);
+app.use(globalErrorHandling,deleteFromCloudinary,deleteFromDB);
+// Integration with Error Handling Middleware to delete from Cloudinary
+// app.use((err, req, res, next) => {
+//     if (req?.filePath) {
+//         deleteFromCloudinary(req, res, () => {
+//             res.status(err.statusCode || 500).json({
+//                 status: 'error',
+//                 message: err.message || 'An unexpected error occurred',
+//             });
+//         });
+//     } else {
+//         res.status(err.statusCode || 500).json({
+//             status: 'error',
+//             message: err.message || 'An unexpected error occurred',
+//         });
+//     }
+// });
 
 const PORT =  process.env.PORT||3000
 app.listen(PORT, () => console.log(`Server is listening on port ${PORT}!`))

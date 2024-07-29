@@ -130,11 +130,11 @@ export const signIn = asyncHandling(async (req, res, next) => {
     if (!isPasswordValid) return next(new AppError('Invalid credentials', 401));
 
     // Create JWT token with expiration
-    console.log(process.env.JWT_SECRET)
+    // console.log(process.env.JWT_SECRET)
     const token = jwt.sign(
         { id: user._id, role: user.role, email: user.email },
         process.env.JWT_SECRET,
-        { expiresIn: '1h' } // Token expiration, e.g., '1h'
+        { expiresIn: '6h' } // Token expiration, e.g., '1h'
     );
 
     // Update user status to online

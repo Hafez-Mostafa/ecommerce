@@ -5,7 +5,8 @@ import orderModel from '../../../db/models/order.model.js';
 
 import AppError from "../../../utils/AppError.js";
 import { asyncHandling } from "../../../utils/errorHandling.js";
-
+import createInvoice from '../../../utils/pdf.js';
+//========================Start create Order ===============================================================
 export const createOrder = asyncHandling(async (req, res, next) => {
     const { productId, quantity, couponCode, address, phone, paymentMethod } = req.body;
 
@@ -35,7 +36,7 @@ export const createOrder = asyncHandling(async (req, res, next) => {
 
     for (let product of products) {
         const checkProduct = await productModel.findOne({ _id: product.productId, stock: { $gte: product.quantity } });
-        if (!checkProduct) { return next(new AppError('product not exists or out of stock', 404));}
+        if (!checkProduct) { return next(new AppError('product not exists or out of stock', 404)); }
         if (flag) product = product.toObject();
         product.title = checkProduct.title;
         product.price = checkProduct.price;
@@ -44,12 +45,13 @@ export const createOrder = asyncHandling(async (req, res, next) => {
         finalProducts.push(product);
     }
 
+
     // create order according the upon handled data 
     const order = await orderModel.create({
         user: req.user._id,
         products: finalProducts,
         subPrice,
-        couponId: req.body.coupon._id,
+        couponId: req.body.coupon?._id,
         totalPrice: subPrice - (subPrice * (req.body.coupon?.amount || 0) / 100),
         paymentMethod,
         status: paymentMethod === 'cash' ? 'placed' : 'waitPayment',
@@ -67,15 +69,44 @@ export const createOrder = asyncHandling(async (req, res, next) => {
         }
         )
     }
-    //clear trhe cart if the order pulled out from it
+    //clear the cart if the order pulled out from it
     if (flag)
         await cartModel.updateOne({ user: req.user._id }, { products: [] })
+
+
+    //create Invoice
+
+
+    const invoice = {
+        shipping: {
+            name: 'req.user.lastname',
+            address: 'req.user.address',
+            city: 'req.user.address[1]',
+            state: "CA",
+            country: "US",
+            postal_code: 'req.user.address[2]'
+        },
+        items: order.products,
+        subtotal: 8000,
+        paid: order.totalPrice,
+        invoice_nr: order._id,
+        date: order.createdAt
+    };
+
+    await createInvoice(createInvoice, "invoice.pdf");
+
+
+
+
+    req.data = { model:orderModel, id:order._id }
 
     res.status(201).json({ msg: "Order created Successfully", order });
 });
 
+//========================End create Order ===============================================================
 
 
+//========================Start cancelO Order ===============================================================
 
 export const cancelOrder = asyncHandling(async (req, res, next) => {
     const { reason } = req.body;
@@ -116,3 +147,4 @@ export const cancelOrder = asyncHandling(async (req, res, next) => {
 
 
 
+//========================End cancel Order ===============================================================

@@ -1,14 +1,4 @@
-import express from 'express'
-import initApp from './utils/initApp.js'
-
-const app = express()
-
-
-initApp(app, express);
-
-
-
-import { createInvoice } from "./utils/pdf.js";
+import { createInvoice } from "../utils/pdf.js";
 
 const invoice = {
   shipping: {
