@@ -5,7 +5,6 @@ import orderModel from '../../../db/models/order.model.js';
 
 import AppError from "../../../utils/AppError.js";
 import { asyncHandling } from "../../../utils/errorHandling.js";
-import createInvoice from '../../../utils/pdf.js';
 //========================Start create Order ===============================================================
 export const createOrder = asyncHandling(async (req, res, next) => {
     const { productId, quantity, couponCode, address, phone, paymentMethod } = req.body;
@@ -77,23 +76,23 @@ export const createOrder = asyncHandling(async (req, res, next) => {
     //create Invoice
 
 
-    const invoice = {
-        shipping: {
-            name: 'req.user.lastname',
-            address: 'req.user.address',
-            city: 'req.user.address[1]',
-            state: "CA",
-            country: "US",
-            postal_code: 'req.user.address[2]'
-        },
-        items: order.products,
-        subtotal: 8000,
-        paid: order.totalPrice,
-        invoice_nr: order._id,
-        date: order.createdAt
-    };
+    // const invoice = {
+    //     shipping: {
+    //         name: 'req.user.lastname',
+    //         address: 'req.user.address',
+    //         city: 'req.user.address[1]',
+    //         state: "CA",
+    //         country: "US",
+    //         postal_code: 'req.user.address[2]'
+    //     },
+    //     items: order.products,
+    //     subtotal: 8000,
+    //     paid: order.totalPrice,
+    //     invoice_nr: order._id,
+    //     date: order.createdAt
+    // };
 
-    await createInvoice(createInvoice, "invoice.pdf");
+    // await createInvoice(createInvoice, "invoice.pdf");
 
 
 
