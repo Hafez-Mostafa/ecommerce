@@ -181,7 +181,7 @@ export const webhook = asyncHandling(async (req, res, next) => {
         return res.status(400).json({msg:"fail"})
       }
       await orderModel.updateOne({_id:orderId},{status:'placed'})
-      return res.status(400).json({msg:"done"})
+      return res.status(200).json({msg:"done"})
     
     
 })
