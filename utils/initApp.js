@@ -47,7 +47,13 @@ app.use(cors(corsConfig));
 app.options("", cors(corsConfig));
 connectionDB()
 app.use(express())
-app.use(express.json());
+app.use((req,res,next)=>{
+    if(req.originalUrl == '/orders/webhook'){
+next()
+    }else{
+        express.json()(req,res,next)
+    }
+});
 
 app.use(express.static(path.resolve('public')));
 app.use('/users',routes.userRouter)

@@ -157,6 +157,38 @@ export const createOrder = asyncHandling(async (req, res, next) => {
 });
 
 //========================End create Order ===============================================================
+export const webhook = asyncHandling(async (req, res, next) => {
+
+
+        const stripe = new Stripe(process.env.STRIPE_SEKRET_KEY)
+    
+        const sig = request.headers['stripe-signature'];
+    
+      let event;
+    
+      try {
+        event = stripe.webhooks.constructEvent(request.body, sig, process.env.ENDPOINTSECRET);
+      } catch (err) {
+        response.status(400).send(`Webhook Error: ${err.message}`);
+        return;
+      }
+    
+      const {orderId}=event.data.object.metadata
+      // Handle the event
+      if (event.type !==  'checkout.session.completed')  {
+        //   const checkoutSessionCompleted = event.data.object;
+        await orderModel.update({_id:orderId},{status:'rejected'})
+        return res.status(400).json({msg:"fail"})
+      }
+      await orderModel.update({_id:orderId},{status:'placed'})
+      return res.status(400).json({msg:"done"})
+    
+    
+})
+
+
+
+
 
 
 //========================Start cancelO Order ===============================================================

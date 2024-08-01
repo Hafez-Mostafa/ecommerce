@@ -1,4 +1,5 @@
-import { Router } from "express";
+import { Router  }   from 'express'
+import  express from 'express'
 //contoller
 import * as OC from './order.controller.js'
 //validation
@@ -24,5 +25,9 @@ route.post('/',
        OC.cancelOrder)
    
 
+
+
+
+route.post('/webhook', express.raw({type: 'application/json'}),OC.webhook)
 
 export default route
