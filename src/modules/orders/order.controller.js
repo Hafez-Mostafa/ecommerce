@@ -5,6 +5,14 @@ import orderModel from '../../../db/models/order.model.js';
 
 import AppError from "../../../utils/AppError.js";
 import { asyncHandling } from "../../../utils/errorHandling.js";
+import { createInvoice } from "../../../utils/pdf.js";
+import { otp } from '../../../services/otp.js';
+import { payment } from '../../../utils/payment.js';
+import Stripe from 'stripe';
+import coupon from '../../../db/models/coupon.model.js';
+
+
+
 //========================Start create Order ===============================================================
 export const createOrder = asyncHandling(async (req, res, next) => {
     const { productId, quantity, couponCode, address, phone, paymentMethod } = req.body;
@@ -38,8 +46,9 @@ export const createOrder = asyncHandling(async (req, res, next) => {
         if (!checkProduct) { return next(new AppError('product not exists or out of stock', 404)); }
         if (flag) product = product.toObject();
         product.title = checkProduct.title;
-        product.price = checkProduct.price;
-        product.finalPrice = product.quantity * checkProduct.price; // Assuming `checkProduct.price` is the correct price field
+        product.price = checkProduct.subPrice;
+        // product.quantity = quantity?quantity :checkProduct.quantity;
+        product.finalPrice = product.quantity * checkProduct.subPrice; // Assuming `checkProduct.price` is the correct price field
         subPrice += product.finalPrice;
         finalProducts.push(product);
     }
@@ -72,34 +81,79 @@ export const createOrder = asyncHandling(async (req, res, next) => {
     if (flag)
         await cartModel.updateOne({ user: req.user._id }, { products: [] })
 
-
+    let date = order.createdAt.toISOString().slice(0, 10)
     //create Invoice
+    const invoice = {
+        shipping: {
+            name: `${req.user.firstname} ${req.user.firstname}`,
+            address: ` ${req.user.address[1]}, ${req.user.address[0]}`,
+            city: ` ${req.user.address[2]}`,
+            state: ` NRW`,
+            postal_code: req.user.address[3]
+        },
+        items: order.products,
+        subtotal: order.subPrice * 100,
+        paid: order.totalPrice * 100,
+        invoice_nr: order._id,
+        date: date,
+        coupon: req.body.coupon?.amount || 0
 
-
-    // const invoice = {
-    //     shipping: {
-    //         name: 'req.user.lastname',
-    //         address: 'req.user.address',
-    //         city: 'req.user.address[1]',
-    //         state: "CA",
-    //         country: "US",
-    //         postal_code: 'req.user.address[2]'
-    //     },
-    //     items: order.products,
-    //     subtotal: 8000,
-    //     paid: order.totalPrice,
-    //     invoice_nr: order._id,
-    //     date: order.createdAt
-    // };
-
-    // await createInvoice(createInvoice, "invoice.pdf");
+    };
 
 
 
 
-    req.data = { model:orderModel, id:order._id }
+    // await createInvoice(invoice, "invoice.pdf");
+    // await otp(req.user.email,"Order Placed","Your Order has been placed successfully",[
+    //     {path:"invoice.pdf", contentType:"application/pdf"},
+    //     {path:"Nagarro.jpg", contentType:"image/jpg"}
+    // ])
 
-    res.status(201).json({ msg: "Order created Successfully", order });
+    if (paymentMethod == "cash") {
+        console.log('in session')
+        const stripe = new Stripe(process.env.STRIPE_SEKRET_KEY)
+        if(req.body?.coupon){
+            const coupon = await stripe.coupons.create({
+                percent_off:req.body.coupon?.amount,
+                duration:"once"
+            })
+            req.body.couponId = coupon.id
+        }
+
+        const session = await payment({
+            
+            stripe: new Stripe(process.env.STRIPE_SEKRET_KEY),
+            payment_method_types: ["card"],
+            mode: "payment",
+            customer_email: req.user.email,
+            metadata:{
+                orderId:order._id.toString()
+            },
+            success_url: `${req.protocol}://${req.headers.host}/orders/success/${order._id}`,
+            cancel_url: `${req.protocol}://${req.headers.host}/orders/cancel/${order._id}`,
+            line_items: order.products.map((product) => {
+                return {
+                    price_data: {
+                        currency: "egp",
+                        product_data: {
+                            name: product.title,
+                            // images:[product.image.secure_url],
+                        },
+                        unit_amount: product.price * 100
+                    },
+                    quantity: products.quantity || quantity
+
+                }
+            }),
+            discounts:req.body?.coupon ? [{coupon:req.body.couponId}]:[]
+        });
+       return  res.status(201).json({ msg: "Paid Successfully", url:session.url ,order});
+
+
+    }
+    req.data = { model: orderModel, id: order._id }
+
+    return  res.status(201).json({ msg: "Order created Successfully", order });
 });
 
 //========================End create Order ===============================================================

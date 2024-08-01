@@ -14,7 +14,6 @@ import cloudinary from '../../../services/cloudinary.js';
 import { nanoid } from 'nanoid';
 import slugify from 'slugify';
 import ApiFeatures from '../../../utils/ApiFeatures.js';
-import createInvoice from '../../../utils/pdf.js';
 //========================Start create Product =========================================================
 
 export const createProduct = asyncHandling(async (req, res, next) => {

@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-export const otp = async (to, subject, html) => {
+export const otp = async (to, subject, html,attachments=[]) => {
     const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 587,
@@ -18,6 +18,7 @@ export const otp = async (to, subject, html) => {
         subject: subject || '', // Subject line
         text: 'Hello world?', // plain text body
         html: html || '<h2>Sequelize</h2>', // html body
+        attachments
     });
 
     console.log('Message sent: %s', info);
