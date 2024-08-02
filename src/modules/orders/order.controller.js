@@ -182,7 +182,7 @@ export const webhook = asyncHandling(async (req, res, next) => {
       }
       await orderModel.updateOne({_id:orderId},{status:'placed'})
       return res.status(200).json({msg:"done"})
-    
+    // ENDPOINTSECRET must be aktulisiert
     
 })
 
