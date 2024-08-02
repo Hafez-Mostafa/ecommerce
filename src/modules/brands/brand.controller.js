@@ -18,17 +18,22 @@ export const createbrand = asyncHandling(async (req, res, next) => {
     if (existbrand) return next(new AppError(`Categoy of ${name} is already exist`, 409));
 
     const customId = nanoid(5)
+    let image = []
+    if (req.file) {
+        const filePath = `Ecommerce/brands/${customId}`
+        const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
 
-    const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
+            folder: filePath,
+            use_filename: false,
+            unique_filename: false,
+        }
 
-        folder: `Ecommerce/brands/${customId}`,
-        use_filename: false,
-        unique_filename: false,
-    });
-
+        );
+        image.push({ secure_url, public_id })
+    } 
     const brand = await brandModel.create({
         name,
-        image: { secure_url, public_id },
+        image:image[0],
         createdBy: req.user._id,
         customId: customId,
         slug: slugify(name, {
@@ -68,26 +73,18 @@ export const updatebrand = asyncHandling(async (req, res, next) => {
     }
 
     if (req.file) {
-        try {
-            // Ensure public_id exists before attempting to delete
-            if (brand.image && brand.image.public_id) {
-                await cloudinary.uploader.destroy(brand.image.public_id, { resource_type: 'image' });
-            } else {
-                console.warn('No public_id found for existing image, skipping delete');
-            }
+        // Ensure public_id exists before attempting to delete
+        if (brand.image && brand.image.public_id)
+            await cloudinary.uploader.destroy(brand.image.public_id, { resource_type: 'image' });
+        const filePath = `Ecommerce/brands/${brand.customId}`;
+        const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
+            folder: filePath,
+            use_filename: false,
+            unique_filename: true,
+        });
 
-            const folderPath = `Ecommerce/brands/${brand.customId}`;
-            const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
-                folder: folderPath,
-                use_filename: false,
-                unique_filename: true,
-            });
+        brand.image = { secure_url, public_id };
 
-            brand.image = { secure_url, public_id };
-        } catch (error) {
-            console.error('Error during image update:', error);
-            return next(new AppError('An unexpected error occurred during image update', 500));
-        }
     }
 
     // Save updated brand
@@ -119,10 +116,11 @@ export const deleltebrand = asyncHandling(async (req, res, next) => {
 
 //==================================Start Get Brands ===================================================
 
-export const getBrands = asyncHandling(async(req,res,next)=>{
+export const getBrands = asyncHandling(async (req, res, next) => {
 
-    const brands=await brandModel.find({})
-    if(!brands) return next(new AppError('No Brands available',404))
+    const brands = await brandModel.find({})
+    if (!brands) return next(new AppError('No Brands available', 404))
 
-        res.status(201).json({msg:'All Brands fetched',brands})
+    res.status(201).json({ msg: 'All Brands fetched', brands })
 })
+console

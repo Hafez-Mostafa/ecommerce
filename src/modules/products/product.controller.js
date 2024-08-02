@@ -38,7 +38,6 @@ export const createProduct = asyncHandling(async (req, res, next) => {
     const subPrice = price - (price * ((discount || 0) / 100));
     const customId = nanoid(5);
     const filePath = `Ecommerce/categories/${existCategory.customId}/subCategories/${existSubCategory.customId}/products/${customId}`;
-    console.log(customId)
     if (!req.files || !req.files.image || req.files.image.length === 0) {
         return next(new AppError('Image is required', 400));
     }

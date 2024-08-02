@@ -20,9 +20,9 @@ route.post('/signUp',validation(UV.signUpValidation),UC.signUp)
 route.post('/signIn',validation(UV.signInValidation),UC.signIn)
 route.get('/verifyEmail/:token',UC.verifyEmail)
 route.get('/refreshToken/:refreshToken',UC.refreshToken)
-route.patch('/update',  auth(systemRoles.user), UC.updateUser);
+route.patch('/update',  auth([systemRoles.user]), UC.updateUser);
 route.delete('/delete', auth([systemRoles.user]), UC.deleteUser);
-route.patch('/updatePassword', auth(systemRoles.user), UC.updatePassword);
+route.patch('/updatePassword', auth([systemRoles.user]), UC.updatePassword);
 route.patch('/forgotPassword', UC.forgotPassword);
 route.patch('/resetpassword', UC.resetPassword);
 

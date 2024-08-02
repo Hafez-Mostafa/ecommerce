@@ -33,19 +33,19 @@ route.patch('/:id',
         .single('image'),
          setHeaders(),
       validation(CV.updateCategory),
-     auth(systemRoles.Admin),
+     auth([systemRoles.Admin]),
     CC.updateCategory)
 
 
 
     route.delete('/:id',
          validation(CV.deleteCategory),
-         auth(systemRoles.Admin),
+         auth([systemRoles.Admin]),
         CC.delelteCategory)
     
 
         route.get('/',
-            // auth(Object.values(systemRoles)),
+            auth(Object.values(systemRoles)),
            CC.getCategories)
        
    

@@ -18,13 +18,13 @@ const route = Router()
 
 route.post('/',
     validation(CV.createCoupon),
-    auth(systemRoles.Admin),
+    auth([systemRoles.Admin]),
     CC.createCoupn)
 
 
     route.patch('/:id',
         validation(CV.updateCoupon),
-        auth(systemRoles.Admin),
+        auth([systemRoles.Admin]),
         CC.updateCoupn)
     
     

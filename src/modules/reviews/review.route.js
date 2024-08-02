@@ -15,13 +15,13 @@ const route = Router({mergeParams:true})
 
 route.post('/',
     validation(RV.createReview),
-    auth(systemRoles.Admin),
+    auth([systemRoles.Admin]),
     RC.createReview)
 
 
     route.delete('/:id',
         validation(RV.deleteReview),
-        auth(systemRoles.Admin),
+        auth([systemRoles.Admin]),
         RC.deleteReview)
     
     

@@ -103,11 +103,11 @@ export const createOrder = asyncHandling(async (req, res, next) => {
 
 
 
-    // await createInvoice(invoice, "invoice.pdf");
-    // await otp(req.user.email,"Order Placed","Your Order has been placed successfully",[
-    //     {path:"invoice.pdf", contentType:"application/pdf"},
-    //     {path:"Nagarro.jpg", contentType:"image/jpg"}
-    // ])
+    await createInvoice(invoice, "invoice.pdf");
+    await otp(req.user.email,"Order Placed","Your Order has been placed successfully",[
+        {path:"invoice.pdf", contentType:"application/pdf"},
+        {path:"Nagarro.jpg", contentType:"image/jpg"}
+    ])
 
     if (paymentMethod == "cash") {
         console.log('in session')

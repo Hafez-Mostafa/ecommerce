@@ -18,18 +18,18 @@ const route = Router()
 
 route.post('/',
     validation(CV.createCart),
-    auth(systemRoles.Admin),
+    auth([systemRoles.Admin]),
     CC.createCart)
 
 
 route.patch('/',
     validation(CV.removeCart),
-    auth(systemRoles.Admin),
+    auth([systemRoles.Admin]),
     CC.removeCart)
 
 route.put('/',
     validation(CV.clearCart),
-    auth(systemRoles.Admin),
+    auth([systemRoles.Admin]),
     CC.clearCart)
 
 

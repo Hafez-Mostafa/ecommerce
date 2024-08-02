@@ -20,14 +20,14 @@ route.post('/',
     configureUpload(fileTypes.images)
         .single('image'),
      validation(CV.createSubCategory),
-    auth(systemRoles.Admin),
+    auth([systemRoles.Admin]),
     SC.createSubCategory)
 
 route.patch('/:id',
     configureUpload(fileTypes.images)
         .single('image'),
-    //  validation(CV.updateSubCategory),
-     auth(systemRoles.Admin),
+     validation(CV.updateSubCategory),
+     auth([systemRoles.Admin]),
     SC.updateCategory)
 
 
@@ -35,12 +35,12 @@ route.patch('/:id',
     
     route.delete('/:id',
         validation(CV.deleteSubCategory),
-        auth(systemRoles.Admin),
+        auth([systemRoles.Admin]),
        SC.deleteSubCategory)
    
 
        route.get('/',
-        // auth(Object.values(systemRoles)),
+        auth(Object.values(systemRoles)),
        SC.getSubCategories)
    
 export default route

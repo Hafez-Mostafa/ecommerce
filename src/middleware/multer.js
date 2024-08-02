@@ -1,5 +1,4 @@
 import multer from 'multer';
-import path from 'path';
 import AppError from '../../utils/AppError.js';
 
 export const fileTypes = {
@@ -8,8 +7,8 @@ export const fileTypes = {
     videos: ["video/mp4", "video/avi", "video/mkv", "video/mov"]
 };
 
-const configureUpload = (validateType) => {
-const storage = multer.diskStorage({})
+const configureUpload = (validateType = []) => {
+    const storage = multer.diskStorage({})
     const fileFilter = (req, file, cb) => {
         if (validateType.includes(file.mimetype)) {
             return cb(null, true);

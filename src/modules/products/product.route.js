@@ -26,7 +26,7 @@ route.post('/',
         { name: "image", maxCount: 1 },
         { name: 'coverImages', maxCount: 4 }]),
     validation(PV.createProduct),
-    auth(systemRoles.Admin),
+    auth([systemRoles.Admin]),
     PC.createProduct)
 
 route.put('/:id',
@@ -34,7 +34,7 @@ route.put('/:id',
         { name: "image", maxCount: 1 },
         { name: 'coverImages', maxCount: 4 }]),
     validation(PV.updateProduct),
-    auth(systemRoles.Admin),
+    auth([systemRoles.Admin]),
     PC.updateProduct)
 
 
@@ -42,7 +42,7 @@ route.put('/:id',
 
     route.delete('/:id',
         validation(PV.deleteProduct),
-        auth(systemRoles.Admin),
+        auth([systemRoles.Admin]),
        PC.deleteProduct)
 
 

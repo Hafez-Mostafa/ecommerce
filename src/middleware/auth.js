@@ -18,18 +18,13 @@ export const auth = (roles = []) => {
         }
         let newToken = token.slice(process.env.JWT_BEARER.length).trim();
 
-        // console.log(newToken)
-
+        if (!newToken)
+            return next(new AppError('Invalid Token', 400));
 
         let decoded = jwt.verify(newToken, process.env.JWT_SECRET);
-
-        // console.log(decoded)
-
         const user = await userModel.findById(decoded.id);
-        if (!user) return next(new AppError('User not found', 400));
+        if (!user) return next(new AppError('User not found', 404));
 
-
-        req.user = user;
 
         // Authorization
         if (roles.length && !roles.includes(user.role)) {
@@ -37,12 +32,12 @@ export const auth = (roles = []) => {
         }
 
 
-        // if (parseInt(user.passwordChangedAt.getTime() / 1000) > decoded.iat) return next(new AppError('Token is expired, please login again', 400));
+        if (parseInt(user?.passwordChangedAt?.getTime() / 1000) > decoded.iat)
+            return next(new AppError('Token is expired, please login again', 403));
 
         req.user = user;
-        // console.log(req)
         next();
-     
+
     });
 };
 

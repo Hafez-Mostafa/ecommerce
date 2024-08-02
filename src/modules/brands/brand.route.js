@@ -19,21 +19,21 @@ route.post('/',
     configureUpload(fileTypes.images)
         .single('image'),
     validation(BV.createBrand),
-    auth(systemRoles.Admin),
+    auth([systemRoles.Admin]),
     BC.createbrand)
 
 route.patch('/:id',
     configureUpload(fileTypes.images)
         .single('image'),
       validation(BV.updateBrand),
-     auth(systemRoles.Admin),
+     auth([systemRoles.Admin]),
     BC.updatebrand)
 
 
 
     route.delete('/:id',
          validation(BV.deleteBrand),
-         auth(systemRoles.Admin),
+         auth([systemRoles.Admin]),
         BC.deleltebrand)
     
 

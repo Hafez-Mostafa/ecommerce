@@ -21,7 +21,7 @@ export const signUp = asyncHandling(async (req, res, next) => {
     (password !== cpassword) && next(new AppError('Passwords do not match', 400));
 
     // Check if the user already exists
-    await userModel.findOne({ email: email.toLowerCase })
+    await userModel.findOne({ email: email.toLowerCase() })
         && next(new AppError('Email is already in Use', 409));
 
     // Create token for email confirmation
@@ -33,7 +33,7 @@ export const signUp = asyncHandling(async (req, res, next) => {
     const otpRefreshLink =
         `${req.protocol}://${req.headers.host}/users/refreshToken/${encodeURIComponent(refreshToken)}`;
 
-    const sendOTP = await otp(process.env.OPT_CONFIRMATION_EMAIL,
+    const sendOTP = await otp(email,
         `User Confirmation @${Date.now()}`, `<h1>Confirmation Account</h1><br><a href=${otpLink}>Confirm the email</a>
         <br> <a href=${otpRefreshLink}>Click here to resend confirmation email</a>`)
     !sendOTP && next(new AppError("Error Sending Email", 400));
@@ -47,8 +47,10 @@ export const signUp = asyncHandling(async (req, res, next) => {
     const newUser = await user.save();
     if (!newUser) return next(new AppError('User could not be created', 400));
 
-    res.status(201).json({ msg: 'Signed up successfully', user: newUser });
+    res.status(201).json({ msg: 'Signed up successfully', user: {name:newUser.firstname,email:newUser.email,mobileNumber:newUser.mobileNumber} });
 });
+
+//================================verifyEmail=================================================
 
 
 export const verifyEmail = asyncHandling(async (req, res, next) => {
@@ -57,7 +59,7 @@ export const verifyEmail = asyncHandling(async (req, res, next) => {
     if (!decoded?.email) return next(new AppError('invalid token', 400));
     const user = await userModel.findOneAndUpdate({ email: decoded.email, confirmed: false }, { confirmed: true }, { new: true });
     if (!user) return next(new AppError('User not exist or already confirmed', 400))
-    res.status(201).json({ msg: 'Email confirmed successfully', user });
+    res.status(201).json({ msg: 'Email confirmed successfully', user: {name:newUser.firstname,email:newUser.email,mobileNumber:newUser.mobileNumber} });
 
 
 });
@@ -72,10 +74,10 @@ export const refreshToken = asyncHandling(async (req, res, next) => {
     const user = await userModel.findOne({email:decoded.email,confirmed:true})
     if(user) return next(new AppError('User already confirmed',400))
     // Create new token
-    const token = jwt.sign({ email: decoded.email }, process.env.JWT_GEN_CONFIRM_EMAIL,{expiresIn:'10m'});
+    const token = jwt.sign({ email: decoded.email }, process.env.JWT_GEN_CONFIRM_EMAIL,{expiresIn:'1h'});
     const otpLink = `${req.protocol}://${req.headers.host}/users/verifyEmail/${encodeURIComponent(token)}`;
     const checkemail = await otp(decoded.email,process.env.OPT_CONFIRMATION_EMAIL,
-        ':) hehe', `<a href=${otpLink}>Confirm the email</a>`);
+            `Email COnfirmation created at${Date.now()}`, `<a href=${otpLink}>Confirm the email</a>`);
     if (!checkemail) return next(new AppError("Error Sending Email", 400));
     res.status(201).json({ msg: 'Email confirmed successfully' });
 });
@@ -203,10 +205,8 @@ export const updatePassword = asyncHandling(async (req, res, next) => {
 export const confirmRecoverEmail = asyncHandling(async (req, res, next) => {
     const { token } = req.params;
     const decoded = jwt.verify(token, process.env.JWT_GEN_CONFIRM_EMAIL);
-    console.log('decoded', decoded.recoveryEmail)
     const user = await userModel.findOneAndUpdate({ recoveryEmail: decoded.recoveryEmail, confirm: false },
         { confirm: true }, { new: true });
-    console.log(user.recoveryEmail)
 
     if (!user) return next(new AppError('User not found or already confirmed', 404));
     res.status(201).json({ msg: 'Email confirmed successfully and Email Reovered' });
