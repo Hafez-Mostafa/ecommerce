@@ -18,23 +18,23 @@ const initApp = (app,express) => {
     
 
 // Add headers middleware
-// app.use((req, res, next) => {
-//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, cdn-loop, cf-connecting-ip, cf-ew-via, cf-ipcountry, cf-ray, cf-visitor, cf-worker, render-proxy-ttl, rndr-id, true-client-ip, x-forwarded-for, x-forwarded-proto, x-request-start");
-//     next();
-// });
-// app.use((req, res, next) => {
-//     // List of headers to remove
-//     const headersToRemove = [
-//         'cdn-loop', 'cf-connecting-ip', 'cf-ew-via', 'cf-ipcountry',
-//         'cf-ray', 'cf-visitor', 'cf-worker', 'render-proxy-ttl',
-//         'rndr-id', 'true-client-ip', 'x-forwarded-for', 
-//         'x-forwarded-proto', 'x-request-start'
-//     ];
-//     headersToRemove.forEach(header => {
-//         delete req.headers[header];
-//     });
-//     next();
-// });
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, cdn-loop, cf-connecting-ip, cf-ew-via, cf-ipcountry, cf-ray, cf-visitor, cf-worker, render-proxy-ttl, rndr-id, true-client-ip, x-forwarded-for, x-forwarded-proto, x-request-start");
+    next();
+});
+app.use((req, res, next) => {
+    // List of headers to remove
+    const headersToRemove = [
+        'cdn-loop', 'cf-connecting-ip', 'cf-ew-via', 'cf-ipcountry',
+        'cf-ray', 'cf-visitor', 'cf-worker', 'render-proxy-ttl',
+        'rndr-id', 'true-client-ip', 'x-forwarded-for', 
+        'x-forwarded-proto', 'x-request-start'
+    ];
+    headersToRemove.forEach(header => {
+        delete req.headers[header];
+    });
+    next();
+});
 
 
 // Configure CORS

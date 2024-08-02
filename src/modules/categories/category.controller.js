@@ -17,7 +17,6 @@ export const createCategory = asyncHandling(async (req, res, next) => {
     // Check if the category already exists
     const existCategory = await categoryModel.findOne({ name: name.toLowerCase() })
     if (existCategory) return next(new AppError(`Categoy of ${name} is already exist`, 409));
-
     const customId = nanoid(5)
 
     const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
