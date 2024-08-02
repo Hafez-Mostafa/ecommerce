@@ -11,43 +11,42 @@ import { fileTypes } from "../../middleware/multer.js";
 import { auth } from "../../middleware/auth.js";
 import systemRoles from "../../../utils/systemRoles.js";
 import subCategoryRouter from "../subCategories/subCategory.route.js";
-import {setHeaders} from '../../middleware/setHeader.js'
+import { setHeaders } from '../../middleware/setHeader.js'
 
 
 
 // const route = express.Router({caseSensitive:true})
 
 const route = express.Router()
-route.use('/:categoryId/subCategories',subCategoryRouter,)
+route.use('/:categoryId/subCategories', subCategoryRouter,)
 route.post('/',
     configureUpload(fileTypes.images)
         .single('image'),
-     validation(CV.createCategory),
+    validation(CV.createCategory),
     auth([systemRoles.Admin]),
     CC.createCategory)
-
-
 
 route.patch('/:id',
     configureUpload(fileTypes.images)
         .single('image'),
-         setHeaders(),
-      validation(CV.updateCategory),
-     auth([systemRoles.Admin]),
+    setHeaders(),
+    validation(CV.updateCategory),
+    auth([systemRoles.Admin]),
     CC.updateCategory)
 
 
 
-    route.delete('/:id',
-         validation(CV.deleteCategory),
-         auth([systemRoles.Admin]),
-        CC.delelteCategory)
-    
+route.delete('/:id',
+    validation(CV.deleteCategory),
+    setHeaders (),
+    auth([systemRoles.Admin]),
+    CC.delelteCategory)
 
-        route.get('/',
-            auth(Object.values(systemRoles)),
-           CC.getCategories)
-       
-   
+
+route.get('/',
+    auth(Object.values(systemRoles)),
+    CC.getCategories)
+
+
 
 export default route
