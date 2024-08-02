@@ -18,14 +18,15 @@ export const createCategory = asyncHandling(async (req, res, next) => {
     const existCategory = await categoryModel.findOne({ name: name.toLowerCase() })
     if (existCategory) return next(new AppError(`Categoy of ${name} is already exist`, 409));
     const customId = nanoid(5)
-
+const filePath= `Ecommerce/categories/${customId}`
     const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
 
-        folder: `Ecommerce/categories/${customId}`,
+        folder:filePath,
         use_filename: false,
         unique_filename: false,
     });
-
+ //pass the filepath  the middleware to handle cloudinary error
+ req.filePath = filePath
     const category = await categoryModel.create({
         name,
         image: { secure_url, public_id },
@@ -36,6 +37,8 @@ export const createCategory = asyncHandling(async (req, res, next) => {
             lower: true
         })
     })
+    req.data = { model: categoryModel, id: category._id }
+
 
     res.status(201).json({ msg: 'Category created Successfully successfully', category });
 });
@@ -68,30 +71,27 @@ export const updateCategory = asyncHandling(async (req, res, next) => {
     }
 
     if (req.file) {
-        try {
             // Ensure public_id exists before attempting to delete
             if (category.image && category.image.public_id) {
                 await cloudinary.uploader.destroy(category.image.public_id, { resource_type: 'image' });
-            } else {
-                console.warn('No public_id found for existing image, skipping delete');
-            }
+            } 
 
-            const folderPath = `Ecommerce/categories/${category.customId}`;
+            const filePath = `Ecommerce/categories/${category.customId}`;
             const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
-                folder: folderPath,
+                folder: filePath,
                 use_filename: false,
                 unique_filename: true,
             });
 
             category.image = { secure_url, public_id };
-        } catch (error) {
-            console.error('Error during image update:', error);
-            return next(new AppError('An unexpected error occurred during image update', 500));
-        }
+       
     }
-
+ //pass the filepath  the middleware to handle cloudinary error
+ req.filePath = filePath
     // Save updated category
     await category.save();
+    req.data = { model: categoryModel, id: category._id }
+
     res.status(201).json({ msg: 'Updated successfully', category });
 });
 

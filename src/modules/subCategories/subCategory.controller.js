@@ -24,17 +24,24 @@ export const createSubCategory = asyncHandling(async (req, res, next) => {
     if (existSubCategory) return next(new AppError(`subCategoy of ${name} is already exist`, 409));
 
     const customId = nanoid(5)
+    const image = []
 
-    const folderPath = `Ecommerce/categories/${existCategory.customId}/subCategories/${customId}`
+    const filePath = `Ecommerce/categories/${existCategory.customId}/subCategories/${customId}`
+if(req.file){
+    
     const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
-        folder: folderPath,
+        folder: filePath,
         use_filename: false,
         unique_filename: false,
     });
+    image.push( { secure_url, public_id })
+}
+    req.filePath = filePath
+
 
     const subCategory = await subCategoryModel.create({
         name,
-        image: { secure_url, public_id },
+        image: image[0],
         createdBy: req.user._id,
         customId: customId,
         slug: slugify(name, {
@@ -44,6 +51,8 @@ export const createSubCategory = asyncHandling(async (req, res, next) => {
 
         category: req.params.categoryId
     })
+    req.data = { model: subCategoryModel, id: subCategory._id }
+
 
     res.status(201).json({ msg: 'Sub Category  screated uccessfully', subCategory });
 });
@@ -81,31 +90,30 @@ export const updateCategory = asyncHandling(async (req, res, next) => {
     }
 
     const customId = nanoid(5)
+    const filePath = `Ecommerce/categories/${category.customId}/subcategories/${customId}`;
     if (req.file) {
-        console.log('Updating category image:', subCategory.image.public_id);
-        try {
+       
             // Ensure public_id exists before attempting to delete
             if (subCategory.image && subCategory.image.public_id) {
                 await cloudinary.uploader.destroy(subCategory.image.public_id, { resource_type: 'image' });
-            } else {
-                console.warn('No public_id found for existing image, skipping delete');
-            }
+            } 
 
-            const folderPath = `Ecommerce/categories/${category.customId}/subcategories/${customId}`;
             const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
-                folder: folderPath,
+                folder: filePath,
                 use_filename: false,
                 unique_filename: true,
             });
 
             subCategory.image = { secure_url, public_id };
-        } catch (error) {
-            console.error('Error during image update:', error);
-            return next(new AppError('An unexpected error occurred during image update', 500));
-        }
+       
     }
+     //pass the filepath  the middleware to handle cloudinary error
+     req.filePath = filePath
 
     await subCategory.save()
+    req.data = { model: subCategoryModel, id: subCategory._id }
+
+
     res.status(201).json({ msg: 'Updated successfully', subCategory });
 });
 
@@ -141,11 +149,11 @@ export const deleteSubCategory = asyncHandling(async (req, res, next) => {
         }
 
         // Ensure there are subcategories before constructing the folder path
-        const folderPath = `Ecommerce/categories/${parentCategory.customId}/subCategories/${subCategory.customId}`;
+        const filePath = `Ecommerce/categories/${parentCategory.customId}/subCategories/${subCategory.customId}`;
 
         // Delete resources and folder in Cloudinary
-        await cloudinary.api.delete_resources_by_prefix(folderPath);
-        await cloudinary.api.delete_folder(folderPath);
+        await cloudinary.api.delete_resources_by_prefix(filePath);
+        await cloudinary.api.delete_folder(filePath);
 
         res.status(201).json({ msg: 'Deleted successfully', subCategory });
     
