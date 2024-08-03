@@ -38,4 +38,4 @@ const invoice = {
   invoice_nr: 1234
 };
 
-createInvoice(invoice, "invoice.pdf");
+// createInvoice(invoice, "invoice.pdf");
