@@ -1,6 +1,9 @@
 import { createWriteStream } from "fs";
 import PDFDocument from "pdfkit";
 
+import path from "path";
+
+
 // source:  https://github.com/PSPDFKit-labs/pdfkit-invoice/blob/master/createInvoice.js
 
  export async function createInvoice(invoice, path) {
@@ -17,7 +20,7 @@ import PDFDocument from "pdfkit";
 
 export async function generateHeader(doc) {
   doc
-      .image("Nagarro.jpg", 50, 45, { width: 50 })
+      .image(`${path.resolve('Nagarro.jpg')}`, 50, 45, { width: 50 })
       .fillColor("#444444")
       .fontSize(20)
       .text("Nagarro ES.", 110, 57)
