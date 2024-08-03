@@ -1,5 +1,3 @@
-
-import AppError from '../../utils/AppError.js';
 const dataMethod = ['body', 'query', 'params', 'headers', 'file', 'files'];
 
 export const validation = (schema) => {
@@ -18,20 +16,9 @@ export const validation = (schema) => {
             }
         });
         if (errorsList.length > 0) {
-            return next(new AppError(`Validation Error:\n${errorsList.join('\\n')}`, 400));
+            return res.status(400).json({message:'Validation error',error:errorsList})
         }
 
         next();
     };
 };
-   //     if (error?.details) {
-                //         error.details.forEach((detail) => {
-                //             errorsList.push(`${key}: ${detail.message}`);
-                //         });
-                //     }
-                // }
-                //  });
-                // if (errorsList.length > 0) {
-                //     const errorMessage = `Validation Error:\n${errorsList.join('\n')}`;
-                //     return next(new AppError(errorMessage, 400));
-                // }

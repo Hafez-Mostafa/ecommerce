@@ -12,10 +12,6 @@ import { auth } from "../../middleware/auth.js";
 import systemRoles from "../../../utils/systemRoles.js";
 import subCategoryRouter from "../subCategories/subCategory.route.js";
 
-
-
-// const route = express.Router({caseSensitive:true})
-
 const route = express.Router()
 route.use('/:categoryId/subCategories', subCategoryRouter,)
 route.post('/',

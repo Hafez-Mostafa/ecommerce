@@ -17,7 +17,7 @@ const route = Router()
 
 route.post('/',
     validation(OV.createOrder),
-    auth([[systemRoles.Admin]]),
+    auth([systemRoles.Admin]),
     OC.createOrder)
 route.patch('/:id',
     validation(OV.cancelOrder),
@@ -31,5 +31,9 @@ route.patch('/:id',
 route.post('/webhook',
     express.raw({ type: 'application/json' }),
     OC.webhook)
+
+
+    route.get('/sucess/:id',OC.success)
+    route.get('/cancel',(req,res,next)=> res.status(400).json({msg:'cancel'}))
 
 export default route

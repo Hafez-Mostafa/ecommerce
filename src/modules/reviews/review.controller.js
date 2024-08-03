@@ -12,7 +12,6 @@ export const createReview = asyncHandling(async (req, res, next) => {
 
     const { comment, rate } = req.body
     const { productId } = req.params
-    console.log(productId)
     // check on product
     const product = await productModel.findById(productId)
     if (!product) return next(new AppError('Product not found', 404))

@@ -59,7 +59,7 @@ export const verifyEmail = asyncHandling(async (req, res, next) => {
     if (!decoded?.email) return next(new AppError('invalid token', 400));
     const user = await userModel.findOneAndUpdate({ email: decoded.email, confirmed: false }, { confirmed: true }, { new: true });
     if (!user) return next(new AppError('User not exist or already confirmed', 400))
-    res.status(201).json({ msg: 'Email confirmed successfully', user: {name:newUser.firstname,email:newUser.email,mobileNumber:newUser.mobileNumber} });
+    res.status(201).json({ msg: 'Email confirmed successfully', user: {name:user.firstname,email:user.email,mobileNumber:user.mobileNumber} });
 
 
 });
@@ -106,15 +106,12 @@ export const resetPassword = asyncHandling(async (req, res, next) => {
     if (!user) return next(new AppError('User is not available!', 404));
     // Check if the user's email is confirmed
     if (user.code != code || code == "") return next(new AppError('invalid code', 404))
-
-
-
     // Hash the new password
     const hashNewPass = bcrypt.hashSync(password, +process.env.ROUND_BHASH_PASSWORD);
     // Update the user's password
     const updatedPass = await userModel.updateOne({ email }, { password: hashNewPass, code: "", passwordChangedAt: Date.now() })
     if (!updatePassword) { return next(new AppError('Error saving new password code', 400)) }
-    res.status(200).json({ msg: 'Password reset successfully' });
+    res.status(200).json({ msg: 'Password reset successfully',updatedPass });
 });
 
 //================================signIn=====================================================
@@ -132,7 +129,6 @@ export const signIn = asyncHandling(async (req, res, next) => {
     if (!isPasswordValid) return next(new AppError('Invalid credentials', 401));
 
     // Create JWT token with expiration
-    // console.log(process.env.JWT_SECRET)
     const token = jwt.sign(
         { id: user._id, role: user.role, email: user.email },
         process.env.JWT_SECRET,
@@ -140,7 +136,7 @@ export const signIn = asyncHandling(async (req, res, next) => {
     );
 
     // Update user status to online
-    await userModel.updateOne({ email }, { status: true });
+    await userModel.updateOne({ email }, { loggedIn: true });
 
     // Send response
     res.status(200).json({ message: 'User signed in successfully', token });

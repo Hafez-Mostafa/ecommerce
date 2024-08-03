@@ -4,12 +4,12 @@ dotenv.config({ path: path.resolve('../../../config/.env') });
 
 import subCategoryModel from '../../../db/models/subCategory.model.js';
 import categoryModel from '../../../db/models/category.model.js';
-
 import AppError from "../../../utils/AppError.js";
 import { asyncHandling } from "../../../utils/errorHandling.js";
 import { nanoid, customAlphabet } from 'nanoid';
-import cloudinary from '../../../services/cloudinary.js';
+
 import slugify from 'slugify'
+import cloudinary from '../../../services/cloudinary.js';
 //==============================signUp=================================================
 
 export const createCategory = asyncHandling(async (req, res, next) => {
@@ -18,18 +18,23 @@ export const createCategory = asyncHandling(async (req, res, next) => {
     const existCategory = await categoryModel.findOne({ name: name.toLowerCase() })
     if (existCategory) return next(new AppError(`Categoy of ${name} is already exist`, 409));
     const customId = nanoid(5)
-const filePath= `Ecommerce/categories/${customId}`
+    const filePath = `Ecommerce/categories/${customId}`
+    const image =[]
+    if(req.file){
+        
     const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
 
-        folder:filePath,
+        folder: filePath,
         use_filename: false,
         unique_filename: false,
     });
- //pass the filepath  the middleware to handle cloudinary error
- req.filePath = filePath
+    image.push({ secure_url, public_id })
+    }
+    //pass the filepath  the middleware to handle cloudinary error
+    req.filePath = filePath
     const category = await categoryModel.create({
         name,
-        image: { secure_url, public_id },
+        image: image[0],
         createdBy: req.user._id,
         customId: customId,
         slug: slugify(name, {
@@ -71,23 +76,23 @@ export const updateCategory = asyncHandling(async (req, res, next) => {
     }
 
     if (req.file) {
-            // Ensure public_id exists before attempting to delete
-            if (category.image && category.image.public_id) {
-                await cloudinary.uploader.destroy(category.image.public_id, { resource_type: 'image' });
-            } 
+        // Ensure public_id exists before attempting to delete
+        if (category.image && category.image.public_id) {
+            await cloudinary.uploader.destroy(category.image.public_id, { resource_type: 'image' });
+        }
 
-            const filePath = `Ecommerce/categories/${category.customId}`;
-            const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
-                folder: filePath,
-                use_filename: false,
-                unique_filename: true,
-            });
+        const filePath = `Ecommerce/categories/${category.customId}`;
+        const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
+            folder: filePath,
+            use_filename: false,
+            unique_filename: true,
+        });
 
-            category.image = { secure_url, public_id };
-       
+        category.image = { secure_url, public_id };
+
     }
- //pass the filepath  the middleware to handle cloudinary error
- req.filePath = filePath
+    //pass the filepath  the middleware to handle cloudinary error
+    req.filePath = filePath
     // Save updated category
     await category.save();
     req.data = { model: categoryModel, id: category._id }
@@ -129,7 +134,7 @@ export const delelteCategory = asyncHandling(async (req, res, next) => {
 export const getCategories = asyncHandling(async (req, res, next) => {
 
     const categories = await categoryModel.find({}).populate([{
-        path:'subCategories'
+        path: 'subCategories'
     }])
     // if (!categories) return next(new AppError('No Categories available', 404))
     // let list = [];

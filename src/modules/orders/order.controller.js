@@ -110,7 +110,6 @@ export const createOrder = asyncHandling(async (req, res, next) => {
     ])
 
     if (paymentMethod == "cash") {
-        console.log('in session')
         const stripe = new Stripe(process.env.STRIPE_SEKRET_KEY)
         if(req.body?.coupon){
             const coupon = await stripe.coupons.create({
@@ -147,6 +146,8 @@ export const createOrder = asyncHandling(async (req, res, next) => {
             }),
             discounts:req.body?.coupon ? [{coupon:req.body.couponId}]:[]
         });
+        req.body.stripeOI= order._id
+
        return  res.status(201).json({ msg: "Paid Successfully", url:session.url ,order});
 
 
@@ -186,9 +187,26 @@ export const webhook = asyncHandling(async (req, res, next) => {
     
 })
 
+export const success = asyncHandling(async (req, res, next) => {
 
+    const {stripeIO}= req.body
+    console.log(stripeIO)
+const order = await orderModel.findOne({user:req.user._id,_id:stripeIO})
+if (!order) return res.status(404).send('Order not found');
 
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+    try {
+        const session = await stripe.checkout.sessions.retrieve(stripeIO);
+        if (session.payment_status === 'paid') {
+            res.sendFile(__dirname + '/success.html'); // Alternatively, you could render a view
+        } else {
+            res.status(400).send('Payment not successful');
+        }
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
+})
 
 
 //========================Start cancelO Order ===============================================================
