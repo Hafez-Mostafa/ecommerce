@@ -15,36 +15,9 @@ import * as  routes from '../src/modules/index.routes.js';
 
 const initApp = (app,express) => {
 
-    
-
-// Add headers middleware
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, cdn-loop, cf-connecting-ip, cf-ew-via, cf-ipcountry, cf-ray, cf-visitor, cf-worker, render-proxy-ttl, rndr-id, true-client-ip, x-forwarded-for, x-forwarded-proto, x-request-start");
-    next();
-});
-app.use((req, res, next) => {
-    // List of headers to remove
-    const headersToRemove = [
-        'cdn-loop', 'cf-connecting-ip', 'cf-ew-via', 'cf-ipcountry',
-        'cf-ray', 'cf-visitor', 'cf-worker', 'render-proxy-ttl',
-        'rndr-id', 'true-client-ip', 'x-forwarded-for', 
-        'x-forwarded-proto', 'x-request-start'
-    ];
-    headersToRemove.forEach(header => {
-        delete req.headers[header];
-    });
-    next();
-});
 
 
-// Configure CORS
-const corsConfig = {
-    origin: "*",
-    credentials: true, 
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
-};
-app.use(cors(corsConfig));
-app.options("", cors(corsConfig));
+app.use(cors());
 connectionDB()
 app.use(express())
 app.use((req,res,next)=>{
@@ -103,12 +76,8 @@ app.use(globalErrorHandling,deleteFromCloudinary,deleteFromDB);
 //     }
 // });
 
-const PORT =  process.env.PORT||3000
-app.listen(PORT, () => console.log(`Server is listening on port ${PORT}!`))
-
-
-
-}
+const PORT =  process.env.PORT||3001
+app.listen(PORT, () => console.log(`Server is listening on port ${PORT}!`))}
 
 
 export default initApp
