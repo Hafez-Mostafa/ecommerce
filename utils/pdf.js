@@ -17,10 +17,9 @@ import path from "path";
   doc.end();
   doc.pipe(createWriteStream(path));
 }
-
 export async function generateHeader(doc) {
   doc
-      .image(`${path.resolve('Nagarro.jpg')}`, 50, 45, { width: 50 })
+    //   .image(`${path.resolve('Nagarro.jpg')}`, 50, 45, { width: 50 })
       .fillColor("#444444")
       .fontSize(20)
       .text("Nagarro ES.", 110, 57)
@@ -32,9 +31,6 @@ export async function generateHeader(doc) {
 }
 
 function generateCustomerInformation(doc, invoice) {
-  // if (!(invoice.date instanceof Date)) {
-  //   throw new Error("invoice.date is not a valid Date object");
-  // }
 
   doc
       .fillColor("#444444")
