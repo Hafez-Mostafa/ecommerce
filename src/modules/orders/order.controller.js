@@ -83,31 +83,31 @@ export const createOrder = asyncHandling(async (req, res, next) => {
 
     let date = order.createdAt.toISOString().slice(0, 10)
     //create Invoice
-    const invoice = {
-        shipping: {
-            name: `${req.user.firstname} ${req.user.firstname}`,
-            address: ` ${req.user.address[1]}, ${req.user.address[0]}`,
-            city: ` ${req.user.address[2]}`,
-            state: ` NRW`,
-            postal_code: req.user.address[3]
-        },
-        items: order.products,
-        subtotal: order.subPrice * 100,
-        paid: order.totalPrice * 100,
-        invoice_nr: order._id,
-        date: date,
-        coupon: req.body.coupon?.amount || 0
+    // const invoice = {
+    //     shipping: {
+    //         name: `${req.user.firstname} ${req.user.firstname}`,
+    //         address: ` ${req.user.address[1]}, ${req.user.address[0]}`,
+    //         city: ` ${req.user.address[2]}`,
+    //         state: ` NRW`,
+    //         postal_code: req.user.address[3]
+    //     },
+    //     items: order.products,
+    //     subtotal: order.subPrice * 100,
+    //     paid: order.totalPrice * 100,
+    //     invoice_nr: order._id,
+    //     date: date,
+    //     coupon: req.body.coupon?.amount || 0
 
-    };
-
-
+    // };
 
 
-    await createInvoice(invoice, "invoice.pdf");
-    await otp(req.user.email,"Order Placed","Your Order has been placed successfully",[
-        {path:"invoice.pdf", contentType:"application/pdf"},
-        {path:"Nagarro.jpg", contentType:"image/jpg"}
-    ])
+
+
+    // await createInvoice(invoice, "invoice.pdf");
+    // await otp(req.user.email,"Order Placed","Your Order has been placed successfully",[
+    //     {path:"invoice.pdf", contentType:"application/pdf"},
+    //     {path:"Nagarro.jpg", contentType:"image/jpg"}
+    // ])
 
     if (paymentMethod == "cash") {
         const stripe = new Stripe(process.env.STRIPE_SEKRET_KEY)

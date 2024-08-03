@@ -25,7 +25,7 @@ console.log(path.resolve( 'Nagarro.jpg'))
 
 export async function generateHeader(doc) {
   doc
-    .image(path.resolve( 'Nagarro.jpg'), 50, 45, { width: 50 })
+    // .image(path.resolve( 'Nagarro.jpg'), 50, 45, { width: 50 })
     .fillColor("#444444")
     .fontSize(20)
     .text("Nagarro ES.", 110, 57)
